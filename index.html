@@ -436,7 +436,7 @@ const CONFIG = {
   /* --- 1. CÔ DÂU & CHÚ RỂ ------------------------------------------ */
   groom: { name: "Khắc Quý",  full: "Nguyễn Khắc Quý", dad: "Ông Nguyễn Khắc Khoa", mom: "Bà Hoàng Thị Nhị",
            addr: "Xóm 2, Thôn Vạn Đồn, Xã Đông Thụy Anh, Tỉnh Hưng Yên" },
-  bride: { name: "Ngọc Bích", full: "Hoàng Ngọc Bích", dad: "Ông Hoàng Văn Luân",   mom: "Bà Hà Thị Oanh",
+  bride: { name: "Ngọc Bích", full: "Hoàng Thị Ngọc Bích", dad: "Ông Hoàng Văn Luân",   mom: "Bà Hà Thị Oanh",
            addr: "Xóm Phố, Thôn Bến, Xã Tân Sơn, Tỉnh Bắc Ninh" },
   monogram: "Q & B",
 
@@ -508,16 +508,11 @@ const CONFIG = {
   ],
 
   /* --- 7. MỪNG CƯỚI -------------------------------------------------
-     ⚠️ CHƯA CÓ THÔNG TIN — bạn điền số tài khoản thật vào đây.
-     qr: lưu ảnh QR từ app ngân hàng vào assets/images/ rồi ghi tên file.
-     Không muốn hiện phần này thì để  /* ĐANG ẨN phần mừng cưới vì chưa có số tài khoản thật.
-     Muốn bật lại: xoá dòng  gifts: [],  bên dưới rồi bỏ dấu chú thích ở khối kế tiếp. */
-  gifts: [],
-  giftsMau: [
-    { side:"Chú rể", bank:"Ngân hàng ... — Chi nhánh ...",
-      owner:"NGUYEN KHAC QUY", acc:"0000000000", qr:"assets/images/qr-quy.png" },
-    { side:"Cô dâu", bank:"Ngân hàng ... — Chi nhánh ...",
-      owner:"HOANG NGOC BICH", acc:"0000000000", qr:"assets/images/qr-bich.png" }
+     Không muốn hiện phần này thì để:  gifts: []
+     Thêm chú rể thì thêm một dòng { ... } nữa vào mảng, cách nhau bằng dấu phẩy. */
+  gifts: [
+    { side:"Cô dâu", bank:"TPBank",
+      owner:"HOANG THI NGOC BICH", acc:"04485121601", qr:"assets/images/qr-bich.png" }
   ],
 
   /* --- 8. NHẠC NỀN --------------------------------------------------
