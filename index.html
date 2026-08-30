@@ -245,6 +245,8 @@ body::before{
 #music.play{animation:spin 6s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
+#ytbox{position:fixed;left:-9999px;top:0;width:320px;height:180px;opacity:0;pointer-events:none}
+
 /* ============ CÁNH HOA RƠI ============ */
 #petals{position:fixed;inset:0;z-index:80;pointer-events:none;overflow:hidden}
 .petal{position:absolute;top:-8vh;font-size:14px;opacity:.75;animation:fall linear forwards}
@@ -285,6 +287,7 @@ body::before{
 <div id="petals" aria-hidden="true"></div>
 <button id="music" aria-label="Bật/tắt nhạc nền">♪</button>
 <audio id="audio" loop preload="none"></audio>
+<div id="ytbox" aria-hidden="true"></div>
 
 <main class="wrap">
 
@@ -541,9 +544,17 @@ const CONFIG = {
       owner:"HOANG THI NGOC BICH", acc:"04485121601", qr:"assets/images/qr-bich.png" }
   ],
 
-  /* --- 8. NHẠC NỀN --------------------------------------------------
-     Bỏ file .mp3 vào assets/music/ rồi điền tên file. Để "" nếu không dùng. */
-  music: "",
+  /* --- 8. NHẠC NỀN ---------------------------------------------------
+     Cách 1 (đang dùng): phát nhạc từ video YouTube CHÍNH CHỦ, nhảy thẳng vào điệp khúc.
+        youtubeId  : mã video (phần sau "youtu.be/" hoặc "watch?v=")
+        musicStart : giây bắt đầu — đặt đúng lúc điệp khúc vào
+        musicEnd   : giây kết thúc, chạy tới đây thì quay lại musicStart. Để 0 = phát hết bài.
+     Cách 2: dùng file nhạc riêng — bỏ .mp3 vào assets/music/ rồi điền vào  music: "..."
+        (chỉ dùng nhạc bạn có quyền sử dụng, vì trang này công khai trên Internet) */
+  youtubeId : "BOFD8x5X_Bo",
+  musicStart: 60,
+  musicEnd  : 0,
+  music     : "",
 
   /* --- 9. RSVP -------------------------------------------------------
      Dán link Google Apps Script vào đây (xem HUONG-DAN.md, bước 6) */
@@ -573,6 +584,12 @@ const CONFIG = {
   const setImg = (el,src,label)=>{ if(!el) return;
     el.onerror = ()=>{ el.onerror=null; el.src = ph(label); };
     el.src = src || ph(label); };
+
+  /* ---- hiện dần khi cuộn (phải khai báo TRƯỚC mọi lệnh render) ---- */
+  const io = new IntersectionObserver(es=>{
+    es.forEach(x=>{ if(x.isIntersecting){ x.target.classList.add("in"); io.unobserve(x.target); } });
+  },{threshold:.12, rootMargin:"0px 0px -8% 0px"});
+  function revealAll(){ $$(".rv:not(.in)").forEach(el=>io.observe(el)); }
 
   /* ---- điền text theo data-c="a.b" ---- */
   const dig = p => p.split(".").reduce((o,k)=>o&&o[k], CONFIG);
@@ -712,11 +729,6 @@ const CONFIG = {
   }
   tick(); setInterval(tick,1000);
 
-  /* ---- 10. HIỆN DẦN KHI CUỘN ---- */
-  const io = new IntersectionObserver(es=>{
-    es.forEach(x=>{ if(x.isIntersecting){ x.target.classList.add("in"); io.unobserve(x.target); } });
-  },{threshold:.12, rootMargin:"0px 0px -8% 0px"});
-  function revealAll(){ $$(".rv:not(.in)").forEach(el=>io.observe(el)); }
   revealAll();
 
   /* ---- 11. CÁNH HOA RƠI ---- */
@@ -742,16 +754,54 @@ const CONFIG = {
 
   /* ---- 12. NHẠC NỀN ---- */
   const audio=$("#audio"), mbtn=$("#music");
-  if(!CONFIG.music){ mbtn.style.display="none"; }
-  else audio.src = CONFIG.music;
+  const YTID = CONFIG.youtubeId || "", ST = Math.max(0, CONFIG.musicStart|0), EN = CONFIG.musicEnd|0;
+  let yt=null, wantPlay=false, loopTimer=null;
+
+  if(!YTID && !CONFIG.music) mbtn.style.display="none";
+  else if(!YTID) audio.src = CONFIG.music;
+
+  if(YTID){
+    const tag=document.createElement("script");
+    tag.src="https://www.youtube.com/iframe_api";
+    document.head.appendChild(tag);
+    window.onYouTubeIframeAPIReady = function(){
+      yt = new YT.Player("ytbox",{
+        videoId: YTID,
+        playerVars:{ autoplay:0, controls:0, start:ST, rel:0, playsinline:1, modestbranding:1 },
+        events:{
+          onReady: ()=>{ try{ yt.setVolume(45); }catch(e){} if(wantPlay) ytPlay(); },
+          onStateChange: e=>{
+            const playing = e.data === YT.PlayerState.PLAYING;
+            mbtn.classList.toggle("play", playing);
+            if(e.data === YT.PlayerState.ENDED){ yt.seekTo(ST); yt.playVideo(); }
+            clearInterval(loopTimer);
+            if(playing && EN > ST){
+              loopTimer = setInterval(()=>{
+                try{ if(yt.getCurrentTime() >= EN) yt.seekTo(ST); }catch(e){}
+              }, 500);
+            }
+          }
+        }
+      });
+    };
+  }
+  function ytPlay(){ try{ yt.seekTo(ST); yt.unMute(); yt.setVolume(45); yt.playVideo(); }catch(e){} }
+
   function playMusic(){
+    wantPlay = true;
+    if(YTID){ if(yt && yt.playVideo) ytPlay(); return; }
     if(!CONFIG.music) return;
     audio.volume = .45;
     audio.play().then(()=>mbtn.classList.add("play")).catch(()=>{});
   }
   mbtn.addEventListener("click", ()=>{
-    if(audio.paused){ playMusic(); }
-    else { audio.pause(); mbtn.classList.remove("play"); }
+    if(YTID){
+      if(!yt || !yt.getPlayerState){ wantPlay = true; return; }
+      if(yt.getPlayerState() === YT.PlayerState.PLAYING){ yt.pauseVideo(); wantPlay=false; }
+      else { wantPlay = true; ytPlay(); }
+      return;
+    }
+    if(audio.paused){ playMusic(); } else { audio.pause(); mbtn.classList.remove("play"); }
   });
 
   /* ---- 13. RSVP ---- */
