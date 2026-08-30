@@ -46,15 +46,15 @@ body::before{
   background:var(--white);box-shadow:0 0 60px rgba(59,47,40,.10);overflow:hidden}
 
 /* ============ TIỆN ÍCH ============ */
-.sec{padding:76px 26px;position:relative}
+.sec{padding:96px 26px;position:relative}
 .sec--beige{background:linear-gradient(180deg,var(--cream),var(--beige))}
 .sec--red{background:var(--red-deep);color:#F6EDE4}
 .center{text-align:center}
 .eyebrow{font-size:.68rem;letter-spacing:.42em;text-transform:uppercase;
   color:var(--gold);font-weight:500;margin-bottom:14px}
 .sec--red .eyebrow{color:var(--beige-3)}
-.h2{font-family:var(--serif);font-size:2rem;font-weight:400;line-height:1.25;letter-spacing:.01em}
-.script{font-family:var(--script);color:var(--red);font-size:2.2rem;line-height:1.2}
+.h2{font-family:var(--serif);font-size:2.15rem;font-weight:400;line-height:1.25;letter-spacing:.01em}
+.script{font-family:var(--script);color:var(--red);font-size:2.5rem;line-height:1.2}
 .lead{color:var(--muted);font-size:.95rem;max-width:34ch;margin:14px auto 0}
 .sec--red .lead{color:#E5D4C4}
 
@@ -99,21 +99,38 @@ body::before{
 .btn--sm{padding:11px 24px;font-size:.7rem}
 
 /* ============ HERO ============ */
-.hero{position:relative;min-height:96svh;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;text-align:center;padding:70px 26px;overflow:hidden;
-  background:linear-gradient(180deg,#fff, var(--cream) 60%, var(--beige))}
-.hero-photo{width:min(78%,330px);aspect-ratio:3/4;object-fit:cover;
-  border-radius:50% 50% 46% 46%/56% 56% 44% 44%;
-  border:1px solid var(--beige-2);box-shadow:0 22px 50px rgba(59,47,40,.16);
-  animation:floaty 7s ease-in-out infinite}
-@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
-.hero-names{font-family:var(--serif);font-size:clamp(2.1rem,9vw,2.9rem);line-height:1.25;margin-top:30px}
-.hero-sub{margin-top:16px;letter-spacing:.34em;font-size:.72rem;text-transform:uppercase;color:var(--muted)}
-.hero-date{margin-top:8px;font-family:var(--serif);font-size:1.15rem;color:var(--red)}
-.scroll-hint{margin-top:34px;font-size:.64rem;letter-spacing:.3em;text-transform:uppercase;color:var(--beige-3)}
-.scroll-hint span{display:block;width:1px;height:34px;background:var(--beige-3);margin:10px auto 0;
+.hero{position:relative;min-height:100svh;display:flex;flex-direction:column;
+  align-items:center;justify-content:flex-end;text-align:center;
+  padding:0 26px 54px;overflow:hidden;color:#fff}
+.hero-bg{position:absolute;inset:0;z-index:0}
+.hero-bg img{width:100%;height:100%;object-fit:cover;
+  animation:kenburns 22s ease-in-out infinite alternate}
+@keyframes kenburns{0%{transform:scale(1)}100%{transform:scale(1.10)}}
+.hero-bg::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(35,24,20,.34) 0%,rgba(35,24,20,.06) 32%,
+             rgba(35,24,20,.42) 72%,rgba(35,24,20,.76) 100%)}
+.hero > *:not(.hero-bg){position:relative;z-index:1}
+.hero-mono{width:64px;height:64px;margin:0 auto 20px;border:1px solid rgba(255,255,255,.6);
+  border-radius:50%;display:grid;place-items:center;font-family:var(--serif);
+  font-size:1rem;letter-spacing:.05em;color:#fff}
+.hero-names{font-family:var(--serif);font-size:clamp(2.4rem,11vw,3.4rem);
+  line-height:1.18;font-weight:400;text-shadow:0 2px 24px rgba(35,24,20,.45)}
+.hero-names .amp{font-family:var(--script);font-size:.62em;display:block;margin:.06em 0;opacity:.92}
+.hero-sub{margin-top:20px;letter-spacing:.36em;font-size:.68rem;text-transform:uppercase;opacity:.88}
+.hero-date{margin-top:12px;font-family:var(--serif);font-size:1.3rem;letter-spacing:.04em}
+.hero-lunar{font-style:italic;font-size:.82rem;opacity:.8;margin-top:2px}
+.scroll-hint{margin-top:30px;font-size:.6rem;letter-spacing:.3em;text-transform:uppercase;opacity:.75}
+.scroll-hint span{display:block;width:1px;height:38px;background:rgba(255,255,255,.7);margin:10px auto 0;
   animation:drop 1.9s ease-in-out infinite;transform-origin:top}
-@keyframes drop{0%,100%{transform:scaleY(.35);opacity:.4}50%{transform:scaleY(1);opacity:1}}
+@keyframes drop{0%,100%{transform:scaleY(.35);opacity:.35}50%{transform:scaleY(1);opacity:1}}
+
+/* ============ DẢI ẢNH TRÀN VIỀN ============ */
+.band{position:relative;height:74svh;overflow:hidden}
+.band img{width:100%;height:100%;object-fit:cover}
+.band::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(35,24,20,.28),rgba(35,24,20,.05) 40%,rgba(35,24,20,.34))}
+.band figcaption{position:absolute;left:0;right:0;bottom:34px;z-index:1;text-align:center;
+  color:#fff;font-family:var(--script);font-size:2rem;text-shadow:0 2px 20px rgba(35,24,20,.5)}
 
 /* ============ ĐẾM NGƯỢC ============ */
 .count{display:flex;justify-content:center;gap:10px;margin-top:28px}
@@ -123,9 +140,10 @@ body::before{
 .count small{display:block;margin-top:6px;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
 
 /* ============ CÂU CHUYỆN ============ */
-.story{display:grid;gap:26px;margin-top:34px}
+.story{display:grid;gap:30px;margin-top:38px}
+.story figure{margin:0 -26px}
 .story figure{position:relative}
-.story img{width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:4px;border:1px solid var(--beige-2)}
+.story img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:2px}
 .story p{color:var(--muted);font-size:.94rem}
 
 /* ============ LỄ CƯỚI ============ */
@@ -163,9 +181,10 @@ body::before{
 .tl p{color:var(--muted);font-size:.9rem}
 
 /* ============ ALBUM ============ */
-.gal{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:32px}
+.gal{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:34px;margin-left:-26px;margin-right:-26px}
+.gal button:first-child{grid-column:1/-1;aspect-ratio:4/5}
 .gal button{overflow:hidden;border-radius:3px;aspect-ratio:3/4;background:var(--beige)}
-.gal button:nth-child(3n+1){aspect-ratio:3/4}
+
 .gal img{width:100%;height:100%;object-fit:cover;transition:transform .8s cubic-bezier(.22,1,.36,1)}
 .gal button:hover img{transform:scale(1.07)}
 #lb{position:fixed;inset:0;z-index:120;background:rgba(30,22,18,.94);
@@ -236,7 +255,7 @@ body::before{
 }
 
 @media(min-width:520px){
-  .sec{padding:88px 40px}
+  .sec{padding:110px 44px}
   .gal{gap:10px}
   .story{grid-template-columns:1fr;gap:30px}
 }
@@ -271,14 +290,15 @@ body::before{
 
   <!-- ===== HERO ===== -->
   <header class="hero">
-    <img class="hero-photo" id="heroPhoto" alt="Ảnh cưới">
-    <h1 class="hero-names rv"><span data-c="groom.name"></span><br>
-      <span class="script" style="font-size:1.6rem">&amp;</span><br>
+    <div class="hero-bg"><img id="heroPhoto" alt="Ảnh cưới Khắc Quý và Ngọc Bích"></div>
+    <div class="hero-mono rv" data-c="monogram"></div>
+    <h1 class="hero-names rv d1"><span data-c="groom.name"></span>
+      <span class="amp">&amp;</span>
       <span data-c="bride.name"></span></h1>
-    <p class="hero-sub rv d1">Chúng tôi sắp kết hôn</p>
-    <p class="hero-date rv d2" data-c="dateLabel"></p>
-    <p class="hero-lunar rv d2" data-c="lunarLabel"></p>
-    <p class="scroll-hint rv d3">Cuộn xuống<span></span></p>
+    <p class="hero-sub rv d2">Chúng tôi sắp kết hôn</p>
+    <p class="hero-date rv d3" data-c="dateLabel"></p>
+    <p class="hero-lunar rv d3" data-c="lunarLabel"></p>
+    <p class="scroll-hint rv d4">Cuộn xuống<span></span></p>
   </header>
 
   <!-- ===== LỜI MỜI + ĐẾM NGƯỢC ===== -->
@@ -297,6 +317,9 @@ body::before{
       <div><b id="cd-s">0</b><small>Giây</small></div>
     </div>
   </section>
+
+  <figure class="band rv"><img data-band="1" alt="Ảnh cưới">
+    <figcaption>Chuyện chúng mình</figcaption></figure>
 
   <!-- ===== CÂU CHUYỆN ===== -->
   <section class="sec center">
@@ -334,6 +357,9 @@ body::before{
     </div>
     <ul class="tl" id="tlList"></ul>
   </section>
+
+  <figure class="band rv"><img data-band="2" alt="Ảnh cưới">
+    <figcaption>20 . 09 . 2026</figcaption></figure>
 
   <!-- ===== ALBUM ===== -->
   <section class="sec sec--beige center">
@@ -578,6 +604,15 @@ const CONFIG = {
   if(CONFIG.heroPos) $("#heroPhoto").style.objectPosition = CONFIG.heroPos;
   setImg($("#storyPhoto"), CONFIG.storyPhoto, "Ảnh kỷ niệm");
   $("#storyText").textContent = CONFIG.storyText;
+
+  /* ---- 3a. DẢI ẢNH TRÀN VIỀN ---- */
+  $$("[data-band]").forEach(el=>{
+    const g = (CONFIG.gallery||[])[+el.dataset.band];
+    if(!g){ el.closest(".band")?.remove(); return; }
+    const o = typeof g === "string" ? {src:g} : g;
+    setImg(el, o.src, "Ảnh cưới");
+    if(o.pos) el.style.objectPosition = o.pos;
+  });
 
   /* ---- 3b. HAI GIA ĐÌNH ---- */
   $("#fams").innerHTML = `
