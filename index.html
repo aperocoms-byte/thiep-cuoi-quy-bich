@@ -598,16 +598,19 @@ const CONFIG = {
   ],
 
   /* --- 8. NHẠC NỀN ---------------------------------------------------
-     Cách 1 (đang dùng): phát nhạc từ video YouTube CHÍNH CHỦ, nhảy thẳng vào điệp khúc.
-        youtubeId  : mã video (phần sau "youtu.be/" hoặc "watch?v=")
-        musicStart : giây bắt đầu — đặt đúng lúc điệp khúc vào
-        musicEnd   : giây kết thúc, chạy tới đây thì quay lại musicStart. Để 0 = phát hết bài.
-     Cách 2: dùng file nhạc riêng — bỏ .mp3 vào assets/music/ rồi điền vào  music: "..."
-        (chỉ dùng nhạc bạn có quyền sử dụng, vì trang này công khai trên Internet) */
-  youtubeId : "BOFD8x5X_Bo",
-  musicStart: 60,
+     ĐANG DÙNG: file nhạc đặt ngay trên trang — chạy được trên mọi trình duyệt,
+     không phụ thuộc YouTube. Bản đang dùng là Bach – Goldberg Variations (Aria),
+     bản thu của Musopen, giấy phép Public Domain Mark 1.0 (tự do sử dụng).
+
+     Muốn đổi bài: bỏ file .mp3 của bạn vào assets/music/ rồi sửa dòng  music:  bên dưới.
+     Chỉ dùng nhạc bạn có quyền sử dụng, vì trang này công khai trên Internet.
+
+     Muốn quay lại phát từ YouTube: điền mã video vào youtubeId và để  music: ""
+     (lưu ý YouTube hay bị trình duyệt chặn tự phát, khách phải bấm nút mới nghe được). */
+  music     : "assets/music/aria.mp3",
+  youtubeId : "",
+  musicStart: 0,
   musicEnd  : 0,
-  music     : "",
 
   /* --- 9. RSVP -------------------------------------------------------
      Dán link Google Apps Script vào đây (xem HUONG-DAN.md, bước 6) */
