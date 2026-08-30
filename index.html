@@ -150,7 +150,8 @@ body::before{
 .btn--sm{padding:11px 26px;font-size:.66rem}
 
 /* --- phong bì dùng ảnh: ẩn các lớp vẽ tay --- */
-.env--photo{background-position:center;background-size:cover;background-repeat:no-repeat}
+.env--photo{background-position:center;background-size:cover;background-repeat:no-repeat;
+  height:auto;width:auto;max-height:100svh;max-width:min(100%,var(--maxw));margin:auto}
 .env--photo .env-tex,.env--photo .flap,.env--photo .flap-sh,.env--photo .seal svg{display:none}
 .env--photo .seal{filter:none;animation:sealTap 3s ease-in-out infinite;border-radius:50%}
 @keyframes sealTap{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:0}
@@ -608,8 +609,8 @@ const CONFIG = {
      Để ""  thì dùng phong bì vẽ bằng CSS/SVG như hiện tại.
      envSealTop / envTextTop: vị trí theo % chiều cao ảnh — canh cho khớp ảnh của bạn. */
   envImage   : "assets/images/envelope.jpg",
-  envSealTop : 72.5,
-  envTextTop : 27,
+  envSealTop : 70.8,
+  envTextTop : 26,
 
   heroPhoto : "assets/images/hero.jpg",
   storyPhoto: "assets/images/story.jpg",
@@ -769,8 +770,10 @@ const CONFIG = {
       env.style.backgroundImage = `url("${CONFIG.envImage}")`;
       env.style.aspectRatio = probe.naturalWidth + "/" + probe.naturalHeight;
       const seal=$(".seal"), ein=$(".env-in");
-      if(seal){ seal.style.top = (CONFIG.envSealTop ?? 72.5) + "%";
-                seal.style.width = seal.style.height = "22%"; }
+      if(seal){ seal.style.top  = (CONFIG.envSealTop ?? 70.8) + "%";
+                seal.style.left = "50%";
+                seal.style.width  = "21%";
+                seal.style.height = (21 * probe.naturalWidth / probe.naturalHeight) + "%"; }
       if(ein){ ein.style.top = (CONFIG.envTextTop ?? 27) + "%"; }
     };
     probe.src = CONFIG.envImage;   /* không có file thì giữ nguyên phong bì vẽ tay */
