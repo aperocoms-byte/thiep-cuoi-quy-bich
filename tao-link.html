@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tạo link mời riêng cho từng khách</title>
+<style>
+:root{--cream:#FDFAF5;--beige:#F1E6D6;--beige2:#E4D3BC;--red:#A32A2A;--ink:#3B2F28;--muted:#8B7768}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--cream);color:var(--ink);
+  line-height:1.6;padding:28px 18px 60px}
+.box{max-width:940px;margin:0 auto}
+h1{font-size:1.5rem;font-weight:600;margin-bottom:6px}
+p.sub{color:var(--muted);font-size:.92rem;margin-bottom:24px}
+label{display:block;font-size:.78rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--muted);margin:16px 0 6px}
+input,textarea{width:100%;padding:11px 13px;font:inherit;background:#fff;border:1px solid var(--beige2);
+  border-radius:8px;outline:none}
+input:focus,textarea:focus{border-color:var(--red)}
+textarea{min-height:170px;resize:vertical;font-family:ui-monospace,Menlo,monospace;font-size:.9rem}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+button{padding:11px 22px;border:none;border-radius:8px;background:var(--red);color:#fff;
+  font:inherit;font-weight:500;cursor:pointer}
+button.alt{background:#fff;color:var(--red);border:1px solid var(--red)}
+table{width:100%;border-collapse:collapse;margin-top:24px;background:#fff;font-size:.88rem}
+th,td{padding:9px 11px;border-bottom:1px solid var(--beige);text-align:left;vertical-align:top}
+th{background:var(--beige);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+td.link{font-family:ui-monospace,Menlo,monospace;font-size:.78rem;word-break:break-all;color:#31607a}
+td.act{white-space:nowrap}
+td.act button{padding:6px 11px;font-size:.76rem;margin-right:5px}
+.hint{background:#fff;border-left:3px solid var(--red);padding:13px 15px;border-radius:0 8px 8px 0;
+  margin-top:22px;font-size:.88rem;color:var(--muted)}
+.hint b{color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="box">
+  <h1>Tạo link mời riêng cho từng khách</h1>
+  <p class="sub">Mỗi khách sẽ nhận một link riêng — mở ra là thấy tên mình trên thiệp.</p>
+
+  <label for="base">Địa chỉ trang thiệp của bạn</label>
+  <input id="base" value="https://khacquy-ngocbich.netlify.app/" placeholder="https://...">
+
+  <label for="tpl">Tin nhắn gửi kèm (dùng <code>{ten}</code> và <code>{link}</code>)</label>
+  <textarea id="tpl" style="min-height:88px">Kính gửi {ten},
+Gia đình chúng tôi trân trọng kính mời tới dự Lễ Thành Hôn của
+Khắc Quý & Ngọc Bích — Chủ Nhật 20.09.2026.
+Thiệp mời điện tử của bạn đây ạ: {link}
+Rất mong được đón tiếp! ♥</textarea>
+
+  <label for="list">Danh sách khách mời — mỗi dòng một người</label>
+  <textarea id="list">Anh Nguyễn Văn A
+Chị Trần Thị B
+Gia đình bác Hoàng
+Vợ chồng bạn Minh &amp; Lan</textarea>
+
+  <div class="row">
+    <button onclick="gen()">Tạo link</button>
+    <button class="alt" onclick="copyAll()">Sao chép toàn bộ</button>
+    <button class="alt" onclick="dlCsv()">Tải file CSV (mở bằng Excel)</button>
+  </div>
+
+  <table id="out" hidden><thead>
+    <tr><th style="width:24%">Khách mời</th><th>Link riêng</th><th style="width:22%">Thao tác</th></tr>
+  </thead><tbody></tbody></table>
+
+  <div class="hint">
+    <b>Cách dùng:</b> dán địa chỉ trang thiệp → dán danh sách khách → bấm <b>Tạo link</b>.
+    Sau đó bấm <b>Copy tin nhắn</b> ở từng dòng rồi dán thẳng vào Zalo / Messenger / SMS gửi cho khách.
+  </div>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+let rows=[];
+
+function build(base, name){
+  let b = base.trim();
+  if(!/^https?:\/\//i.test(b)) b = "https://" + b;
+  b = b.split("#")[0];
+  const u = new URL(b);
+  u.searchParams.set("guest", name);
+  return u.toString();
+}
+function gen(){
+  const base=$("#base").value, tpl=$("#tpl").value;
+  const names=$("#list").value.split("\n").map(s=>s.trim()).filter(Boolean);
+  rows = names.map(n=>{
+    const link = build(base,n);
+    return { name:n, link, msg: tpl.replaceAll("{ten}",n).replaceAll("{link}",link) };
+  });
+  const tb=$("#out").querySelector("tbody");
+  tb.innerHTML = rows.map((r,i)=>`<tr>
+    <td>${r.name.replace(/[<>&]/g,"")}</td>
+    <td class="link"><a href="${r.link}" target="_blank" rel="noopener">${r.link}</a></td>
+    <td class="act">
+      <button onclick="cp(${i},'link')">Copy link</button>
+      <button onclick="cp(${i},'msg')">Copy tin nhắn</button>
+    </td></tr>`).join("");
+  $("#out").hidden = rows.length===0;
+}
+async function put(txt,btn){
+  try{ await navigator.clipboard.writeText(txt); }
+  catch{ const t=document.createElement("textarea"); t.value=txt; document.body.appendChild(t);
+         t.select(); document.execCommand("copy"); t.remove(); }
+  if(btn){ const o=btn.textContent; btn.textContent="Đã copy ✓"; setTimeout(()=>btn.textContent=o,1400); }
+}
+function cp(i,k){ put(rows[i][k], event.target); }
+function copyAll(){
+  if(!rows.length) gen();
+  put(rows.map(r=>r.name+"\t"+r.link).join("\n"), event.target);
+}
+function dlCsv(){
+  if(!rows.length) gen();
+  const q=s=>'"'+String(s).replaceAll('"','""')+'"';
+  const csv="﻿"+["Ten khach,Link moi,Tin nhan"].concat(
+    rows.map(r=>[q(r.name),q(r.link),q(r.msg)].join(","))).join("\n");
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));
+  a.download="danh-sach-khach-moi.csv"; a.click(); URL.revokeObjectURL(a.href);
+}
+gen();
+</script>
+</body>
+</html>
