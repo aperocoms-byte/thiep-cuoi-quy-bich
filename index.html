@@ -268,7 +268,16 @@ body::before{
 #music.play{animation:spin 6s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-#ytbox{position:fixed;left:-9999px;top:0;width:320px;height:180px;opacity:0;pointer-events:none}
+#ytbox{position:fixed;right:16px;bottom:18px;width:46px;height:46px;z-index:99;
+  border-radius:50%;overflow:hidden;opacity:.02;pointer-events:none;
+  transition:width .3s,height .3s,opacity .3s,bottom .3s,border-radius .3s}
+#ytbox iframe{width:100%;height:100%;border:0;display:block}
+#ytbox.show{opacity:1;width:230px;height:130px;border-radius:12px;bottom:76px;
+  pointer-events:auto;box-shadow:0 12px 34px rgba(35,24,20,.4)}
+#ytHint{position:fixed;right:16px;bottom:212px;z-index:99;max-width:230px;display:none;
+  background:var(--red-deep);color:#F6EDE4;font-size:.72rem;line-height:1.5;
+  padding:10px 12px;border-radius:10px;box-shadow:0 10px 26px rgba(35,24,20,.3)}
+#ytHint.show{display:block}
 
 /* ============ CÁNH HOA RƠI ============ */
 #petals{position:fixed;inset:0;z-index:80;pointer-events:none;overflow:hidden}
@@ -310,7 +319,8 @@ body::before{
 <div id="petals" aria-hidden="true"></div>
 <button id="music" aria-label="Bật/tắt nhạc nền">♪</button>
 <audio id="audio" loop preload="none"></audio>
-<div id="ytbox" aria-hidden="true"></div>
+<div id="ytbox"></div>
+<div id="ytHint">Điện thoại đang chặn tự phát nhạc — bấm nút ▶ trên khung này để bật nhé.</div>
 
 <main class="wrap">
 
@@ -813,9 +823,11 @@ const CONFIG = {
         playerVars:{ autoplay:0, controls:0, start:ST, rel:0, playsinline:1, modestbranding:1 },
         events:{
           onReady: ()=>{ try{ yt.setVolume(45); }catch(e){} if(wantPlay) ytPlay(); },
+          onError: ()=>{ mbtn.style.display="none"; },
           onStateChange: e=>{
             const playing = e.data === YT.PlayerState.PLAYING;
             mbtn.classList.toggle("play", playing);
+            if(playing){ clearTimeout(checkTimer); ytHide(); }
             if(e.data === YT.PlayerState.ENDED){ yt.seekTo(ST); yt.playVideo(); }
             clearInterval(loopTimer);
             if(playing && EN > ST){
@@ -828,7 +840,18 @@ const CONFIG = {
       });
     };
   }
-  function ytPlay(){ try{ yt.seekTo(ST); yt.unMute(); yt.setVolume(45); yt.playVideo(); }catch(e){} }
+  const ytbox=$("#ytbox"), ytHint=$("#ytHint");
+  let checkTimer=null;
+  function ytPlay(){
+    try{ yt.seekTo(ST); yt.unMute(); yt.setVolume(45); yt.playVideo(); }catch(e){ return; }
+    /* Nếu sau 2,5s vẫn chưa phát (trình duyệt chặn) thì bung khung player ra cho khách tự bấm */
+    clearTimeout(checkTimer);
+    checkTimer = setTimeout(()=>{
+      let st = -1; try{ st = yt.getPlayerState(); }catch(e){}
+      if(st !== 1){ ytbox.classList.add("show"); ytHint.classList.add("show"); }
+    }, 2500);
+  }
+  function ytHide(){ ytbox.classList.remove("show"); ytHint.classList.remove("show"); }
 
   function playMusic(){
     wantPlay = true;
