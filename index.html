@@ -77,11 +77,12 @@ body::before{
 
 /* ============ MÀN MỞ THIỆP: PHONG BÌ NIÊM SÁP ============ */
 #cover{position:fixed;inset:0;z-index:90;background:var(--cream);
-  display:flex;align-items:stretch;justify-content:center;
+  display:flex;align-items:center;justify-content:center;
   transition:opacity .9s ease,visibility .9s}
 #cover.gone{opacity:0;visibility:hidden}
 
-.env{position:relative;width:100%;max-width:var(--maxw);overflow:hidden;background:#6E1819}
+.env{position:relative;width:100%;max-width:var(--maxw);height:100%;max-height:100svh;
+  overflow:hidden;background:#6E1819}
 
 /* vân da lộn: đốm lớn + hạt mịn + tối rìa */
 .env-tex{position:absolute;inset:0}
@@ -147,6 +148,15 @@ body::before{
 .btn--ghost{background:transparent;color:var(--red);border:1px solid var(--red);box-shadow:none}
 .btn--ghost:hover{background:var(--red);color:#fff}
 .btn--sm{padding:11px 26px;font-size:.66rem}
+
+/* --- phong bì dùng ảnh: ẩn các lớp vẽ tay --- */
+.env--photo{background-position:center;background-size:cover;background-repeat:no-repeat}
+.env--photo .env-tex,.env--photo .flap,.env--photo .flap-sh,.env--photo .seal svg{display:none}
+.env--photo .seal{filter:none;animation:sealTap 3s ease-in-out infinite;border-radius:50%}
+@keyframes sealTap{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:0}
+  50%{transform:translate(-50%,-50%) scale(1.12);opacity:.16}}
+.env--photo .seal{background:radial-gradient(circle,#fff 0%,transparent 70%)}
+#cover.opening .env--photo{opacity:0;transform:scale(1.05);transition:.7s}
 
 /* ============ HERO ============ */
 .hero{position:relative;min-height:100svh;display:flex;flex-direction:column;
@@ -593,6 +603,14 @@ const CONFIG = {
   rsvpDeadline: "10.09.2026",
 
   /* --- 3. ẢNH ------------------------------------------------------- */
+  /* Ảnh phong bì cho màn mở thiệp (đã gồm nắp + dấu sáp).
+     Lưu ảnh vào assets/images/ rồi điền tên file vào đây.
+     Để ""  thì dùng phong bì vẽ bằng CSS/SVG như hiện tại.
+     envSealTop / envTextTop: vị trí theo % chiều cao ảnh — canh cho khớp ảnh của bạn. */
+  envImage   : "assets/images/envelope.jpg",
+  envSealTop : 72.5,
+  envTextTop : 27,
+
   heroPhoto : "assets/images/hero.jpg",
   storyPhoto: "assets/images/story.jpg",
   heroPos   : "center 26%",          /* canh khung ảnh bìa: 0% = sát mép trên, 100% = sát mép dưới */
@@ -741,6 +759,22 @@ const CONFIG = {
   if(CONFIG.heroPos) $("#heroPhoto").style.objectPosition = CONFIG.heroPos;
   setImg($("#storyPhoto"), CONFIG.storyPhoto, "Ảnh kỷ niệm");
   $("#storyText").textContent = CONFIG.storyText;
+
+  /* ---- 3z. PHONG BÌ DÙNG ẢNH ---- */
+  if(CONFIG.envImage){
+    const env=document.querySelector(".env");
+    const probe=new Image();
+    probe.onload = ()=>{
+      env.classList.add("env--photo");
+      env.style.backgroundImage = `url("${CONFIG.envImage}")`;
+      env.style.aspectRatio = probe.naturalWidth + "/" + probe.naturalHeight;
+      const seal=$(".seal"), ein=$(".env-in");
+      if(seal){ seal.style.top = (CONFIG.envSealTop ?? 72.5) + "%";
+                seal.style.width = seal.style.height = "22%"; }
+      if(ein){ ein.style.top = (CONFIG.envTextTop ?? 27) + "%"; }
+    };
+    probe.src = CONFIG.envImage;   /* không có file thì giữ nguyên phong bì vẽ tay */
+  }
 
   /* ---- 3a. DẢI ẢNH TRÀN VIỀN ---- */
   $$("[data-band]").forEach(el=>{
