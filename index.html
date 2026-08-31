@@ -13,6 +13,51 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Dancing+Script:wght@500;700&family=Be+Vietnam+Pro:wght@200;300;400;500&display=swap" rel="stylesheet">
+
+<!-- ==========================================================
+     TOÀN BỘ NỘI DUNG THIỆP NẰM TRONG FILE  config.js
+     Muốn sửa: nháy đúp file  MO-BANG-SUA.command  ở cùng thư mục
+     ========================================================== -->
+<script src="config.js"></script>
+<script>
+(function(){
+  /* Chế độ xem thử của bảng điều khiển: dùng tạm nội dung đang chỉnh dở */
+  if(/[?&]preview=1/.test(location.search)){
+    try{
+      var raw = sessionStorage.getItem("__thiepPreview");
+      if(raw) window.CONFIG = JSON.parse(raw);
+      document.documentElement.classList.add("is-preview");
+    }catch(e){}
+  }
+
+  /* ---- ÁP GIAO DIỆN: font, màu, cỡ chữ, bề ngang ---- */
+  var C = window.CONFIG || {}, T = C.theme || {}, K = T.colors || {};
+  var r = document.documentElement.style;
+  var mapc = { cream:"--cream", beige:"--beige", beige2:"--beige-2", beige3:"--beige-3",
+               red:"--red", redDeep:"--red-deep", redSoft:"--red-soft",
+               gold:"--gold", ink:"--ink", muted:"--muted" };
+  for(var k in mapc){ if(K[k]) r.setProperty(mapc[k], K[k]); }
+  if(T.maxWidth) r.setProperty("--maxw", T.maxWidth + "px");
+  if(T.scale)    r.setProperty("font-size", (16 * T.scale / 100).toFixed(2) + "px");
+
+  var stack = { fontDisplay:['--display','Georgia,serif'], fontSerif:['--serif','Georgia,serif'],
+                fontScript:['--script','cursive'],
+                fontSans:['--sans','system-ui,-apple-system,"Segoe UI",sans-serif'] };
+  var need = [], weights = { fontDisplay:"300;400;500;600", fontSerif:"400;500;600",
+                             fontScript:"500;700", fontSans:"200;300;400;500" };
+  for(var f in stack){
+    if(!T[f]) continue;
+    r.setProperty(stack[f][0], '"' + T[f] + '",' + stack[f][1]);
+    need.push("family=" + encodeURIComponent(T[f]).replace(/%20/g,"+") + ":wght@" + weights[f]);
+  }
+  if(need.length){
+    var l = document.createElement("link");
+    l.rel = "stylesheet";
+    l.href = "https://fonts.googleapis.com/css2?" + need.join("&") + "&display=swap";
+    document.head.appendChild(l);
+  }
+})();
+</script>
 <style>
 /* ============ TOKENS ============ */
 :root{
@@ -329,41 +374,39 @@ body::before{
 <main class="wrap">
 
   <!-- ===== HERO ===== -->
-  <header class="hero">
+  <header class="hero" data-sec="hero">
     <div class="hero-bg"><img id="heroPhoto" alt="Ảnh cưới Khắc Quý và Ngọc Bích"></div>
     <div class="hero-mono rv" data-c="monogram"></div>
     <h1 class="hero-names rv d1"><span data-c="groom.name"></span>
       <span class="amp">&amp;</span>
       <span data-c="bride.name"></span></h1>
-    <p class="hero-sub rv d2">Chúng tôi sắp kết hôn</p>
+    <p class="hero-sub rv d2" data-sec-title>Chúng tôi sắp kết hôn</p>
     <p class="hero-date rv d3" data-c="dateLabel"></p>
     <p class="hero-lunar rv d3" data-c="lunarLabel"></p>
     <p class="scroll-hint rv d4">Cuộn xuống<span></span></p>
   </header>
 
   <!-- ===== LỜI MỜI ===== -->
-  <section class="sec invite">
-    <p class="invite-text rv">Trân trọng kính mời quý vị<br>tới dự Lễ Thành Hôn của
-      <b><span data-c="groom.name"></span> &amp; <span data-c="bride.name"></span></b></p>
+  <section class="sec invite" data-sec="invite">
+    <p class="invite-text rv" id="inviteLead"></p>
 
     <div class="invite-div rv d1"></div>
 
     <p class="eyebrow rv d1">Date &amp; Time</p>
-    <p class="dt-title rv d2">Thời gian</p>
-    <p class="dt-val rv d2">13<span style="font-size:.6em">h</span>00 &nbsp;|&nbsp; 20.09.2026</p>
+    <p class="dt-title rv d2" data-sec-title>Thời gian</p>
+    <p class="dt-val rv d2" id="inviteTime"></p>
     <p class="dt-lunar rv d2" data-c="lunarLabel"></p>
 
     <div class="loc rv d3">
-      <p class="eyebrow">Địa điểm</p>
-      <p class="name">Tư gia nhà trai</p>
-      <p class="addr">Xóm 2, Thôn Vạn Đồn, Xã Đông Thụy Anh, Tỉnh Hưng Yên</p>
-      <a class="btn btn--ghost btn--sm" href="https://www.google.com/maps/search/?api=1&amp;query=20.5946700,106.5741880"
-         target="_blank" rel="noopener">Xem bản đồ</a>
+      <p class="eyebrow" id="locLabel"></p>
+      <p class="name" id="locName"></p>
+      <p class="addr" id="locAddr"></p>
+      <a class="btn btn--ghost btn--sm" id="locMap" target="_blank" rel="noopener"></a>
     </div>
   </section>
 
   <!-- ===== ĐẾM NGƯỢC ===== -->
-  <section class="sec sec--beige center">
+  <section class="sec sec--beige center" data-sec="countdown">
     <p class="eyebrow rv">Còn lại</p>
     <h2 class="h2 rv d1">Đếm ngược tới ngày vui</h2>
     <div class="rule rv d1"><i>❦</i></div>
@@ -378,11 +421,11 @@ body::before{
     </div>
   </section>
 
-  <figure class="band rv"><img data-band="1" alt="Ảnh cưới">
+  <figure class="band rv" data-sec="band1"><img data-band="1" alt="Ảnh cưới">
     <figcaption>Chuyện chúng mình</figcaption></figure>
 
   <!-- ===== CÂU CHUYỆN ===== -->
-  <section class="sec center">
+  <section class="sec center" data-sec="story">
     <p class="eyebrow rv">Our story</p>
     <h2 class="script rv d1">Chuyện chúng mình</h2>
     <div class="rule rv d1"><i>❦</i></div>
@@ -393,7 +436,7 @@ body::before{
   </section>
 
   <!-- ===== HAI GIA ĐÌNH ===== -->
-  <section class="sec center">
+  <section class="sec center" data-sec="family">
     <p class="eyebrow rv">Hai gia đình</p>
     <h2 class="h2 rv d1">Trân trọng báo hỷ</h2>
     <div class="rule rv d1"><i>&#10086;</i></div>
@@ -401,7 +444,7 @@ body::before{
   </section>
 
   <!-- ===== LỄ CƯỚI ===== -->
-  <section class="sec sec--beige center" id="events">
+  <section class="sec sec--beige center" id="events" data-sec="events">
     <p class="eyebrow rv">Chương trình</p>
     <h2 class="h2 rv d1">Sự kiện cưới</h2>
     <div class="rule rv d1"><i>❦</i></div>
@@ -409,7 +452,7 @@ body::before{
   </section>
 
   <!-- ===== TIMELINE ===== -->
-  <section class="sec">
+  <section class="sec" data-sec="timeline">
     <div class="center">
       <p class="eyebrow rv">Timeline</p>
       <h2 class="script rv d1">Lịch trình ngày cưới</h2>
@@ -418,11 +461,11 @@ body::before{
     <ul class="tl" id="tlList"></ul>
   </section>
 
-  <figure class="band rv"><img data-band="2" alt="Ảnh cưới">
+  <figure class="band rv" data-sec="band2"><img data-band="2" alt="Ảnh cưới">
     <figcaption>20 . 09 . 2026</figcaption></figure>
 
   <!-- ===== ALBUM ===== -->
-  <section class="sec sec--beige center">
+  <section class="sec sec--beige center" data-sec="gallery">
     <p class="eyebrow rv">Album</p>
     <h2 class="h2 rv d1">Khoảnh khắc của chúng tôi</h2>
     <div class="rule rv d1"><i>❦</i></div>
@@ -430,7 +473,7 @@ body::before{
   </section>
 
   <!-- ===== MỪNG CƯỚI ===== -->
-  <section class="sec sec--red center" id="giftSec">
+  <section class="sec sec--red center" id="giftSec" data-sec="gifts">
     <p class="eyebrow rv">Hộp mừng cưới</p>
     <h2 class="script rv d1" style="color:#F6EDE4">Gửi lời chúc phúc</h2>
     <p class="lead rv d2">Nếu ở xa không thể đến chung vui, bạn có thể gửi lời chúc
@@ -439,7 +482,7 @@ body::before{
   </section>
 
   <!-- ===== RSVP ===== -->
-  <section class="sec center" id="rsvp">
+  <section class="sec center" id="rsvp" data-sec="rsvp">
     <p class="eyebrow rv">R.S.V.P</p>
     <h2 class="h2 rv d1">Xác nhận tham dự</h2>
     <div class="rule rv d1"><i>❦</i></div>
@@ -485,7 +528,7 @@ body::before{
   </section>
 
   <!-- ===== SỔ LƯU BÚT ===== -->
-  <section class="sec sec--beige center">
+  <section class="sec sec--beige center" data-sec="wishes">
     <p class="eyebrow rv">Sổ lưu bút</p>
     <h2 class="script rv d1">Lời chúc từ mọi người</h2>
     <div class="rule rv d1"><i>❦</i></div>
@@ -494,8 +537,8 @@ body::before{
   </section>
 
   <!-- ===== FOOTER ===== -->
-  <footer class="foot">
-    <p class="script">Thank you</p>
+  <footer class="foot" data-sec="footer">
+    <p class="script" data-sec-title>Thank you</p>
     <p class="lead">Cảm ơn bạn đã dành thời gian đọc thiệp mời này.<br>
       Chúng tôi rất mong được gặp bạn trong ngày hạnh phúc.</p>
     <p style="margin-top:22px;font-family:var(--serif);font-size:1.2rem">
@@ -512,22 +555,6 @@ body::before{
   <button class="nav next" aria-label="Ảnh sau">&rsaquo;</button>
 </div>
 
-<!-- ==========================================================
-     TOÀN BỘ NỘI DUNG THIỆP NẰM TRONG FILE  config.js
-     Muốn sửa: nháy đúp file  MO-BANG-SUA.command  ở cùng thư mục
-     ========================================================== -->
-<script src="config.js"></script>
-<script>
-/* Chế độ xem thử của bảng điều khiển: lấy tạm nội dung đang chỉnh */
-(function(){
-  if(!/[?&]preview=1/.test(location.search)) return;
-  try{
-    const raw = sessionStorage.getItem("__thiepPreview");
-    if(raw) window.CONFIG = JSON.parse(raw);
-    document.documentElement.classList.add("is-preview");
-  }catch(e){}
-})();
-</script>
 
 <script>
 (function(){
@@ -553,6 +580,48 @@ body::before{
   },{threshold:.12, rootMargin:"0px 0px -8% 0px"});
   function revealAll(){ $$(".rv:not(.in)").forEach(el=>io.observe(el)); }
 
+  /* ---- 0. BỐ CỤC: bật/tắt, sắp xếp, đổi tiêu đề từng mục ---- */
+  const SEC = {};
+  (CONFIG.sections||[]).forEach(x=>{ if(x && x.id) SEC[x.id] = x; });
+  $$("[data-sec]").forEach(el=>{
+    const c = SEC[el.dataset.sec];
+    if(!c) return;
+    if(c.on === false){ el.remove(); return; }
+    const eb = el.querySelector(".eyebrow");   if(eb && c.eyebrow != null) eb.textContent = c.eyebrow;
+    const fc = el.querySelector("figcaption");
+    if(fc){ if(c.title != null) fc.textContent = c.title; }
+    else {
+      const h = el.querySelector("h2, [data-sec-title]");
+      if(h && c.title != null){
+        h.innerHTML = c.title;
+        if(h.tagName === "H2" && c.script != null){
+          h.classList.toggle("script", !!c.script);
+          h.classList.toggle("h2", !c.script);
+        }
+      }
+    }
+    const ld = el.querySelector(".lead"); if(ld && c.lead != null) ld.innerHTML = c.lead;
+  });
+  const wrapEl = $(".wrap");
+  (CONFIG.sections||[]).forEach(x=>{
+    const el = wrapEl.querySelector('[data-sec="' + x.id + '"]');
+    if(el) wrapEl.appendChild(el);
+  });
+
+  /* ---- 0b. KHỐI LỜI MỜI ---- */
+  const IV = CONFIG.invite || {};
+  const gn = esc(CONFIG.groom.name), bn = esc(CONFIG.bride.name);
+  if($("#inviteLead")) $("#inviteLead").innerHTML = (IV.lead||"") + " <b>" + gn + " &amp; " + bn + "</b>";
+  if($("#inviteTime")) $("#inviteTime").innerHTML = IV.timeValue || "";
+  if($("#locLabel"))   $("#locLabel").textContent = IV.locLabel || "";
+  if($("#locName"))    $("#locName").textContent  = IV.locName  || "";
+  if($("#locAddr"))    $("#locAddr").textContent  = IV.locAddr  || "";
+  const lmap = $("#locMap");
+  if(lmap){
+    if(IV.locMap){ lmap.href = IV.locMap; lmap.textContent = IV.locBtn || "Xem bản đồ"; }
+    else lmap.remove();
+  }
+
   /* ---- điền text theo data-c="a.b" ---- */
   const dig = p => p.split(".").reduce((o,k)=>o&&o[k], CONFIG);
   $$("[data-c]").forEach(el => el.textContent = dig(el.dataset.c) ?? "");
@@ -567,13 +636,20 @@ body::before{
 
   /* ---- 2. MỞ THIỆP ---- */
   const cover = $("#cover");
+  /* Bảng điều khiển bảo bỏ qua màn phong bì thì vào thẳng nội dung */
+  let skipCover = /[?&]open=1/.test(location.search);
+  try{ if(sessionStorage.getItem("__thiepSkipCover") === "1") skipCover = true; }catch(e){}
+  if(skipCover){
+    cover.style.display = "none";
+    document.body.classList.remove("locked");
+  }
   $("#openBtn").addEventListener("click", ()=>{
     cover.classList.add("opening");
     setTimeout(()=>cover.classList.add("gone"), 620);
     document.body.classList.remove("locked");
     setTimeout(()=>{ cover.style.display="none"; },1600);
     playMusic();
-    startPetals();
+    if(!CONFIG.theme || CONFIG.theme.petals !== false) startPetals();
     revealAll();
   });
 
@@ -585,6 +661,7 @@ body::before{
 
   /* ---- 3z. PHONG BÌ ---- */
   setImg($("#envImg"), CONFIG.envImage, "Phong bì");
+  if(CONFIG.envLine1 != null) $(".env-guest").textContent = CONFIG.envLine1;
   if(CONFIG.envSealTop) $(".seal").style.top = CONFIG.envSealTop + "%";
   if(CONFIG.envTextTop) $(".env-in").style.top = CONFIG.envTextTop + "%";
 
@@ -737,8 +814,8 @@ body::before{
     });
   }
 
-  function ytStart(){
-    if(ytFrame) return;
+  function ytStart(show){
+    if(ytFrame){ if(show) ytbox.classList.add("show"); return; }
     ytFrame = document.createElement("iframe");
     ytFrame.allow = "autoplay; encrypted-media";
     ytFrame.setAttribute("allowfullscreen","");
@@ -747,9 +824,7 @@ body::before{
       (ST ? "&start=" + ST : "");
     ytbox.appendChild(ytFrame);
     mbtn.classList.add("play");
-    /* Trình duyệt nào chặn tự phát thì bung khung ra cho khách bấm ▶ */
-    clearTimeout(revealTimer);
-    revealTimer = setTimeout(()=>{ ytbox.classList.add("show"); ytHint.classList.add("show"); }, 3000);
+    if(show){ ytbox.classList.add("show"); }
   }
   function ytStop(){
     clearTimeout(revealTimer);
@@ -767,7 +842,9 @@ body::before{
       if(v >= VOL) clearInterval(t);
     }, 60);
   }
+  const PREVIEW = document.documentElement.classList.contains("is-preview");
   function playMusic(){
+    if(PREVIEW) return;          /* đang xem thử trong bảng điều khiển */
     if(YTID){ ytStart(); return; }
     if(!CONFIG.music) return;
     if(ST > 0 && audio.currentTime < ST){ try{ audio.currentTime = ST; }catch(e){} }
@@ -781,7 +858,7 @@ body::before{
     });
   }
   mbtn.addEventListener("click", ()=>{
-    if(YTID){ ytFrame ? ytStop() : ytStart(); return; }
+    if(YTID){ ytFrame ? ytStop() : ytStart(true); return; }
     if(audio.paused){ playMusic(); } else { audio.pause(); mbtn.classList.remove("play"); }
   });
 
