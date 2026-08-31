@@ -109,8 +109,8 @@ window.CONFIG = {
      Dùng file mp3 đặt trong assets/music/ — chạy được trên mọi trình duyệt.
      Chỉ dùng nhạc bạn có quyền sử dụng, vì trang này công khai trên Internet.
      musicStart / musicEnd: giây, để cắt đoạn. Để 0 cả hai là phát cả bài. */
-  music     : "assets/music/mot-doi.mp3",
-  youtubeId : "",
+  music     : "",
+  youtubeId : "BOFD8x5X_Bo",
   musicStart: 0,
   musicEnd  : 0,
 
