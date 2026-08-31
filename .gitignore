@@ -1,2 +1,4 @@
 .DS_Store
 Nhạc/
+assets/music/*.mp3
+!assets/music/aria.mp3

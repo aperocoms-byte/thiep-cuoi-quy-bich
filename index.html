@@ -273,6 +273,9 @@ body::before{
   background:var(--red);color:#fff;display:grid;place-items:center;font-size:1rem;
   box-shadow:0 8px 22px rgba(163,42,42,.35);transition:.3s}
 #music.play{animation:spin 6s linear infinite}
+#music.need-tap{animation:needTap 1.5s ease-in-out infinite}
+@keyframes needTap{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(246,237,231,.45)}
+  50%{transform:scale(1.09);box-shadow:0 0 0 13px rgba(246,237,231,0)}}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 #ytbox{position:fixed;right:16px;bottom:18px;width:46px;height:46px;z-index:99;
@@ -509,134 +512,27 @@ body::before{
   <button class="nav next" aria-label="Ảnh sau">&rsaquo;</button>
 </div>
 
+<!-- ==========================================================
+     TOÀN BỘ NỘI DUNG THIỆP NẰM TRONG FILE  config.js
+     Muốn sửa: nháy đúp file  MO-BANG-SUA.command  ở cùng thư mục
+     ========================================================== -->
+<script src="config.js"></script>
 <script>
-/* =====================================================================
-   ██  SỬA THÔNG TIN CỦA BẠN Ở NGAY TRONG KHỐI CONFIG NÀY  ██
-   Sửa xong bấm lưu file rồi mở lại trang là thấy đổi ngay.
-   ===================================================================== */
-const CONFIG = {
-
-  /* --- 1. CÔ DÂU & CHÚ RỂ ------------------------------------------ */
-  groom: { name: "Khắc Quý",  full: "Nguyễn Khắc Quý", dad: "Ông Nguyễn Khắc Khoa", mom: "Bà Hoàng Thị Nhị",
-           addr: "Xóm 2, Thôn Vạn Đồn, Xã Đông Thụy Anh, Tỉnh Hưng Yên" },
-  bride: { name: "Ngọc Bích", full: "Hoàng Thị Ngọc Bích", dad: "Ông Hoàng Văn Luân",   mom: "Bà Hà Thị Oanh",
-           addr: "Xóm Phố, Thôn Bến, Xã Tân Sơn, Tỉnh Bắc Ninh" },
-  monogram: "Q & B",
-
-  /* --- 2. NGÀY GIỜ --------------------------------------------------
-     weddingISO dùng cho ĐẾM NGƯỢC — đang đếm tới Lễ Thành Hôn 13:00 ngày 20.09.2026 */
-  weddingISO  : "2026-09-20T13:00:00+07:00",
-  dateLabel   : "Chủ Nhật · 20 . 09 . 2026",
-  envDateLabel: "19/9 - 20/9/2026",        /* dòng ngày trên màn phong bì */
-  lunarLabel  : "Tức ngày 10 tháng 8 năm Bính Ngọ",
-  rsvpDeadline: "10.09.2026",
-
-  /* --- 3. ẢNH ------------------------------------------------------- */
-  /* Ảnh phong bì cho màn mở thiệp (đã gồm nắp + dấu sáp).
-     Lưu ảnh vào assets/images/ rồi điền tên file vào đây.
-     Để ""  thì dùng phong bì vẽ bằng CSS/SVG như hiện tại.
-     envSealTop / envTextTop: vị trí theo % chiều cao ảnh — canh cho khớp ảnh của bạn. */
-  envImage   : "assets/images/envelope.jpg",
-  envSealTop : 70.8,
-  envTextTop : 26,
-
-  heroPhoto : "assets/images/hero.jpg",
-  storyPhoto: "assets/images/story.jpg",
-  heroPos   : "center 26%",          /* canh khung ảnh bìa: 0% = sát mép trên, 100% = sát mép dưới */
-  gallery   : [
-    { src:"assets/images/1.jpg", pos:"center 30%" },
-    { src:"assets/images/2.jpg", pos:"center 28%" },
-    { src:"assets/images/3.jpg", pos:"center 32%" },
-    { src:"assets/images/4.jpg", pos:"center 26%" },
-    { src:"assets/images/5.jpg", pos:"center 62%" }
-  ],
-
-  /* --- 4. CHUYỆN CHÚNG MÌNH (bạn sửa lại cho đúng chuyện của mình nhé) --- */
-  storyText: "Chúng mình đến với nhau không bằng điều gì to tát — chỉ là những buổi tan làm " +
-             "đi chung một đoạn đường, những bữa cơm nấu vội, và thói quen kể cho nhau nghe " +
-             "chuyện của một ngày rất đỗi bình thường. Rồi một hôm cả hai cùng nhận ra: " +
-             "người mình muốn kể chuyện cùng mỗi tối, hoá ra là người mình muốn đi cùng cả đời. " +
-             "Ngày 20.09.2026, chúng mình về chung một nhà — và sẽ thật trọn vẹn nếu có bạn ở đó.",
-
-/* --- 5. CÁC SỰ KIỆN CƯỚI ------------------------------------------
-     map: dán link Google Maps thật của từng địa điểm vào đây */
-  events: [
-    { title:"Lễ Vu Quy", who:"Nhà gái",
-      when:"06:00 · Chủ Nhật, 20.09.2026",
-      lunar:"Tức ngày 10 tháng 8 năm Bính Ngọ",
-      place:"Tại tư gia nhà gái",
-      addr:"Xóm Phố, Thôn Bến, Xã Tân Sơn, Tỉnh Bắc Ninh",
-      map:"https://www.google.com/maps/search/?api=1&query=21.5977250,106.5911640" },
-
-    { title:"Lễ Thành Hôn", who:"Nhà trai",
-      when:"13:00 · Chủ Nhật, 20.09.2026",
-      lunar:"Tức ngày 10 tháng 8 năm Bính Ngọ",
-      place:"Tại tư gia nhà trai",
-      addr:"Xóm 2, Thôn Vạn Đồn, Xã Đông Thụy Anh, Tỉnh Hưng Yên",
-      map:"https://www.google.com/maps/search/?api=1&query=20.5946700,106.5741880" },
-
-    { title:"Tiệc Nhà Gái", who:"Bữa cơm thân mật",
-      when:"16:00 · Thứ Bảy, 19.09.2026",
-      lunar:"Tức ngày 9 tháng 8 năm Bính Ngọ",
-      place:"Tại tư gia nhà gái",
-      addr:"Xóm Phố, Thôn Bến, Xã Tân Sơn, Tỉnh Bắc Ninh",
-      map:"https://www.google.com/maps/search/?api=1&query=21.5977250,106.5911640" },
-
-    { title:"Tiệc Nhà Trai", who:"Bữa cơm thân mật",
-      when:"17:00 · Thứ Bảy, 19.09.2026",
-      lunar:"Tức ngày 9 tháng 8 năm Bính Ngọ",
-      place:"Tại tư gia nhà trai",
-      addr:"Xóm 2, Thôn Vạn Đồn, Xã Đông Thụy Anh, Tỉnh Hưng Yên",
-      map:"https://www.google.com/maps/search/?api=1&query=20.5946700,106.5741880" }
-  ],
-
-  /* --- 6. LỊCH TRÌNH NGÀY CƯỚI 20.09.2026 ---------------------------- */
-  timeline: [
-    { t:"06:00", d:"Lễ Vu Quy tại tư gia nhà gái — Thôn Bến, Xã Tân Sơn, Bắc Ninh" },
-    { t:"08:30", d:"Nhà trai xin dâu, đoàn rước dâu khởi hành về Hưng Yên" },
-    { t:"11:00", d:"Đón dâu về tới tư gia nhà trai — Thôn Vạn Đồn, Đông Thụy Anh" },
-    { t:"13:00", d:"Lễ Thành Hôn — nghi thức chính thức tại tư gia nhà trai" },
-    { t:"14:00", d:"Dùng tiệc, chụp ảnh lưu niệm cùng cô dâu chú rể" }
-  ],
-
-  /* --- 7. MUNG CUOI: tai khoan nhan mung cuoi. De  gifts: []  neu muon an phan nay --- */
-  gifts: [
-    { side:"Chú rể", bank:"TPBank",
-      owner:"NGUYEN KHAC QUY", acc:"02336471301", qr:"assets/images/qr-quy.png" },
-    { side:"Cô dâu", bank:"TPBank",
-      owner:"HOANG THI NGOC BICH", acc:"04485121601", qr:"assets/images/qr-bich.png" }
-  ],
-
-  /* --- 8. NHẠC NỀN ---------------------------------------------------
-     ĐANG DÙNG: file nhạc đặt ngay trên trang — chạy được trên mọi trình duyệt,
-     không phụ thuộc YouTube. Bản đang dùng là Bach – Goldberg Variations (Aria),
-     bản thu của Musopen, giấy phép Public Domain Mark 1.0 (tự do sử dụng).
-
-     Muốn đổi bài: bỏ file .mp3 của bạn vào assets/music/ rồi sửa dòng  music:  bên dưới.
-     Chỉ dùng nhạc bạn có quyền sử dụng, vì trang này công khai trên Internet.
-
-     Muốn quay lại phát từ YouTube: điền mã video vào youtubeId và để  music: ""
-     (lưu ý YouTube hay bị trình duyệt chặn tự phát, khách phải bấm nút mới nghe được). */
-  music     : "assets/music/mot-doi.mp3",
-  youtubeId : "",
-  musicStart: 0,
-  musicEnd  : 0,
-
-  /* --- 9. RSVP -------------------------------------------------------
-     Dán link Google Apps Script vào đây (xem HUONG-DAN.md, bước 6) */
-  rsvpEndpoint: "",
-
-  /* --- 10. LỜI CHÚC HIỂN THỊ SẴN ------------------------------------- */
-  wishes: [
-    { by:"Gia đình hai bên", msg:"Chúc Khắc Quý và Ngọc Bích trăm năm hạnh phúc, đầu bạc răng long!" }
-  ]
-};
-/* ================= HẾT PHẦN CẦN SỬA ================= */
+/* Chế độ xem thử của bảng điều khiển: lấy tạm nội dung đang chỉnh */
+(function(){
+  if(!/[?&]preview=1/.test(location.search)) return;
+  try{
+    const raw = sessionStorage.getItem("__thiepPreview");
+    if(raw) window.CONFIG = JSON.parse(raw);
+    document.documentElement.classList.add("is-preview");
+  }catch(e){}
+})();
 </script>
 
 <script>
 (function(){
   "use strict";
+  const CONFIG = window.CONFIG;
   const $  = (s,r=document)=>r.querySelector(s);
   const $$ = (s,r=document)=>[...r.querySelectorAll(s)];
   const esc = s => String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -826,11 +722,20 @@ const CONFIG = {
 
   /* ---- 12. NHẠC NỀN ---- */
   const audio=$("#audio"), mbtn=$("#music"), ytbox=$("#ytbox"), ytHint=$("#ytHint");
-  const YTID = CONFIG.youtubeId || "", ST = Math.max(0, CONFIG.musicStart|0);
+  const YTID = CONFIG.youtubeId || "", ST = Math.max(0, CONFIG.musicStart|0),
+        EN = Math.max(0, CONFIG.musicEnd|0);
   let ytFrame = null, revealTimer = null;
 
   if(!YTID && !CONFIG.music) mbtn.style.display = "none";
-  else if(!YTID) audio.src = CONFIG.music;
+  else if(!YTID){
+    audio.src = CONFIG.music;
+    /* Tải sẵn nhạc ngay khi khách chạm màn hình lần đầu, để lúc mở thiệp là nghe được liền */
+    addEventListener("pointerdown", ()=>{ try{ audio.load(); }catch(e){} }, {once:true, passive:true});
+    /* Cắt đoạn: chạm mốc musicEnd thì quay lại musicStart */
+    audio.addEventListener("timeupdate", ()=>{
+      if(EN > ST && audio.currentTime >= EN) audio.currentTime = ST;
+    });
+  }
 
   function ytStart(){
     if(ytFrame) return;
@@ -853,11 +758,27 @@ const CONFIG = {
     mbtn.classList.remove("play");
   }
 
+  const VOL = .45;
+  function fadeIn(){                 /* nhạc vào êm chứ không bật đánh uỳnh */
+    let v = 0; audio.volume = 0;
+    const t = setInterval(()=>{
+      v = Math.min(VOL, v + VOL/25);
+      try{ audio.volume = v; }catch(e){}
+      if(v >= VOL) clearInterval(t);
+    }, 60);
+  }
   function playMusic(){
     if(YTID){ ytStart(); return; }
     if(!CONFIG.music) return;
-    audio.volume = .45;
-    audio.play().then(()=>mbtn.classList.add("play")).catch(()=>{});
+    if(ST > 0 && audio.currentTime < ST){ try{ audio.currentTime = ST; }catch(e){} }
+    audio.play().then(()=>{
+      mbtn.classList.add("play");
+      mbtn.classList.remove("need-tap");
+      fadeIn();
+    }).catch(()=>{
+      /* Trình duyệt chặn tự phát — cho nút ♪ nhấp nháy để khách tự bấm */
+      mbtn.classList.add("need-tap");
+    });
   }
   mbtn.addEventListener("click", ()=>{
     if(YTID){ ytFrame ? ytStop() : ytStart(); return; }
