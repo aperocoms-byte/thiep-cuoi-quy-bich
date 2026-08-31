@@ -110,8 +110,8 @@ window.CONFIG = {
      Chỉ dùng nhạc bạn có quyền sử dụng, vì trang này công khai trên Internet.
      musicStart / musicEnd: giây, để cắt đoạn. Để 0 cả hai là phát cả bài. */
   music     : "",
-  youtubeId : "BOFD8x5X_Bo",
-  musicStart: 0,
+  youtubeId : "lEH2pVsHJg4",
+  musicStart: 113,
   musicEnd  : 0,
 
   /* --- 11. RSVP ------------------------------------------------------ */
