@@ -617,8 +617,8 @@ const CONFIG = {
 
      Muốn quay lại phát từ YouTube: điền mã video vào youtubeId và để  music: ""
      (lưu ý YouTube hay bị trình duyệt chặn tự phát, khách phải bấm nút mới nghe được). */
-  music     : "",
-  youtubeId : "BOFD8x5X_Bo",
+  music     : "assets/music/mot-doi.mp3",
+  youtubeId : "",
   musicStart: 0,
   musicEnd  : 0,
 
@@ -825,68 +825,42 @@ const CONFIG = {
   }
 
   /* ---- 12. NHẠC NỀN ---- */
-  const audio=$("#audio"), mbtn=$("#music");
-  const YTID = CONFIG.youtubeId || "", ST = Math.max(0, CONFIG.musicStart|0), EN = CONFIG.musicEnd|0;
-  let yt=null, wantPlay=false, loopTimer=null;
+  const audio=$("#audio"), mbtn=$("#music"), ytbox=$("#ytbox"), ytHint=$("#ytHint");
+  const YTID = CONFIG.youtubeId || "", ST = Math.max(0, CONFIG.musicStart|0);
+  let ytFrame = null, revealTimer = null;
 
-  if(!YTID && !CONFIG.music) mbtn.style.display="none";
+  if(!YTID && !CONFIG.music) mbtn.style.display = "none";
   else if(!YTID) audio.src = CONFIG.music;
 
-  if(YTID){
-    const tag=document.createElement("script");
-    tag.src="https://www.youtube.com/iframe_api";
-    document.head.appendChild(tag);
-    window.onYouTubeIframeAPIReady = function(){
-      yt = new YT.Player("ytbox",{
-        videoId: YTID,
-        playerVars:{ autoplay:0, controls:0, start:ST, rel:0, playsinline:1,
-                      modestbranding:1, enablejsapi:1, origin:location.origin },
-        events:{
-          onReady: ()=>{ window.__yt = yt; try{ yt.setVolume(45); }catch(e){} if(wantPlay) ytPlay(); },
-          onError: ()=>{ mbtn.style.display="none"; },
-          onStateChange: e=>{
-            const playing = e.data === YT.PlayerState.PLAYING;
-            mbtn.classList.toggle("play", playing);
-            if(playing){ clearTimeout(checkTimer); ytHide(); }
-            if(e.data === YT.PlayerState.ENDED){ yt.seekTo(ST); yt.playVideo(); }
-            clearInterval(loopTimer);
-            if(playing && EN > ST){
-              loopTimer = setInterval(()=>{
-                try{ if(yt.getCurrentTime() >= EN) yt.seekTo(ST); }catch(e){}
-              }, 500);
-            }
-          }
-        }
-      });
-    };
+  function ytStart(){
+    if(ytFrame) return;
+    ytFrame = document.createElement("iframe");
+    ytFrame.allow = "autoplay; encrypted-media";
+    ytFrame.setAttribute("allowfullscreen","");
+    ytFrame.src = "https://www.youtube.com/embed/" + YTID +
+      "?autoplay=1&controls=1&playsinline=1&rel=0&loop=1&playlist=" + YTID +
+      (ST ? "&start=" + ST : "");
+    ytbox.appendChild(ytFrame);
+    mbtn.classList.add("play");
+    /* Trình duyệt nào chặn tự phát thì bung khung ra cho khách bấm ▶ */
+    clearTimeout(revealTimer);
+    revealTimer = setTimeout(()=>{ ytbox.classList.add("show"); ytHint.classList.add("show"); }, 3000);
   }
-  const ytbox=$("#ytbox"), ytHint=$("#ytHint");
-  let checkTimer=null;
-  function ytPlay(){
-    try{ yt.seekTo(ST); yt.unMute(); yt.setVolume(45); yt.playVideo(); }catch(e){ return; }
-    /* Nếu sau 2,5s vẫn chưa phát (trình duyệt chặn) thì bung khung player ra cho khách tự bấm */
-    clearTimeout(checkTimer);
-    checkTimer = setTimeout(()=>{
-      let st = -1; try{ st = yt.getPlayerState(); }catch(e){}
-      if(st !== 1){ ytbox.classList.add("show"); ytHint.classList.add("show"); }
-    }, 2500);
+  function ytStop(){
+    clearTimeout(revealTimer);
+    if(ytFrame){ ytFrame.remove(); ytFrame = null; }
+    ytbox.classList.remove("show"); ytHint.classList.remove("show");
+    mbtn.classList.remove("play");
   }
-  function ytHide(){ ytbox.classList.remove("show"); ytHint.classList.remove("show"); }
 
   function playMusic(){
-    wantPlay = true;
-    if(YTID){ if(yt && yt.playVideo) ytPlay(); return; }
+    if(YTID){ ytStart(); return; }
     if(!CONFIG.music) return;
     audio.volume = .45;
     audio.play().then(()=>mbtn.classList.add("play")).catch(()=>{});
   }
   mbtn.addEventListener("click", ()=>{
-    if(YTID){
-      if(!yt || !yt.getPlayerState){ wantPlay = true; return; }
-      if(yt.getPlayerState() === YT.PlayerState.PLAYING){ yt.pauseVideo(); wantPlay=false; }
-      else { wantPlay = true; ytPlay(); }
-      return;
-    }
+    if(YTID){ ytFrame ? ytStop() : ytStart(); return; }
     if(audio.paused){ playMusic(); } else { audio.pause(); mbtn.classList.remove("play"); }
   });
 
